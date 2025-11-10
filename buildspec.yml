@@ -1,0 +1,39 @@
+version: 0.2
+
+env:
+  variables:
+    CODEARTIFACT_DOMAIN: "nextwork"
+    CODEARTIFACT_DOMAIN_OWNER: "<AWS_ACCOUNT_ID>" 608145123434
+    CODEARTIFACT_REGION: "us-east-1
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+      - echo "Install phase: ensure tools present"
+  pre_build:
+    commands:
+      - set -e
+      - echo "Logging in to AWS CodeArtifact..."
+      - CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain "nextwork" --domain-owner "608145123434" --region "us-east-1" --query authorizationToken --output text)
+      - export CODEARTIFACT_AUTH_TOKEN
+      - echo "CODEARTIFACT_AUTH_TOKEN set (masked)"
+  build:
+    commands:
+      - echo "Build started on `date`"
+      - mvn -B clean install -s settings.xml
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+      - echo "Packaging artifacts..."
+      - mvn -B package -s settings.xml
+
+artifacts:
+  files:
+    - target/*.war
+  discard-paths: no
+
+cache:
+  paths:
+    - '/root/.m2/**/*'

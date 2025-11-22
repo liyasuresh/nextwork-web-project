@@ -19,11 +19,10 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Packaging artifacts...
 
 artifacts:
   files:
-    - target/nextwork-web-project.war
     - appspec.yml
     - scripts/**/*
+    - target/nextwork-web-project.war
   discard-paths: no
